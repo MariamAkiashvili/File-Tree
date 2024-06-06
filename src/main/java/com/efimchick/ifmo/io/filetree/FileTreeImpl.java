@@ -112,10 +112,13 @@ public class FileTreeImpl implements FileTree {
                 Arrays.sort(fileNames, (file1, file2) -> {
                     if (file1.isDirectory() && !file2.isDirectory()) {
                         return -1; // file1 is a directory, file2 is not
-                    } else // (!file1.isDirectory() && file2.isDirectory()) {
-                    {
-                        return 1;
-                    } // file1 is not a directory, file2 is
+                    }  else if (!file1.isDirectory() && file2.isDirectory()) {
+                        return 1;// file1 is not a directory, file2 is
+                    }else{
+
+                    return file1.getName().compareToIgnoreCase(file2.getName());
+                }
+
                 });
 
                 // Convert the sorted File array back to a DirectoryStream<Path>
