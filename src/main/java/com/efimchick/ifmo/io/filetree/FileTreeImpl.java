@@ -22,7 +22,6 @@ public class FileTreeImpl implements FileTree {
         }
 
         String result = "";
-        String space = "";
 
         File file = new File(String.valueOf(path));
         if (file.isFile()) {
@@ -30,25 +29,24 @@ public class FileTreeImpl implements FileTree {
         }
 
         if (file.isDirectory()) {
-            result = (getHierarchy(file, path, result, "", 0, 0, true));
+            result = (getHierarchy(file, path, result, "", 0, 0));
         }
 
         return Optional.of(result);
 
     }
 
-    String getHierarchy(File file, Path path, String result, String pattern, int index, int depth, boolean parentIsLastChild) {
+    String getHierarchy(File file, Path path, String result, String pattern, int index, int depth) {
 
         // Base Case
         if (!file.exists()) {
             return result;
         }
 
-        Path dir = path;
 //        result += pattern;
         result += file.getName() + " " + getSize(file) + " bytes\n";
 //        try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
-        try (DirectoryStream<Path> sortedStream = sortDirectories(dir)) {
+        try (DirectoryStream<Path> sortedStream = sortDirectories(path)) {
 
 
             for (Path files : sortedStream) {
@@ -66,13 +64,13 @@ public class FileTreeImpl implements FileTree {
                 if (ff.isDirectory()) {
                     depth++;
                     result += pattern;
-                    parentIsLastChild = (index == Objects.requireNonNull(file.listFiles()).length);
+                    boolean parentIsLastChild = (index == Objects.requireNonNull(file.listFiles()).length);
 
 
                     pattern = pattern.substring(0, pattern.length() - 3);
                     pattern += parentIsLastChild ? "   ": "│  ";
 
-                    result = getHierarchy(ff, files, result, pattern, 0, depth, parentIsLastChild);
+                    result = getHierarchy(ff, files, result, pattern, 0, depth);
                     pattern = pattern.substring(0, pattern.length() - 3);
                     depth--;
                 }
@@ -124,13 +122,13 @@ public class FileTreeImpl implements FileTree {
                 List<Path> sortedPaths = Arrays.stream(fileNames)
                         .map(File::toPath)
                         .collect(Collectors.toList());
-                return new DirectoryStream<Path>() {
+                return new DirectoryStream<>() {
                     private final List<Path> paths = sortedPaths;
                     private int index = 0;
 
                     @Override
                     public java.util.Iterator<Path> iterator() {
-                        return new java.util.Iterator<Path>() {
+                        return new java.util.Iterator<>() {
                             @Override
                             public boolean hasNext() {
                                 return index < paths.size();
