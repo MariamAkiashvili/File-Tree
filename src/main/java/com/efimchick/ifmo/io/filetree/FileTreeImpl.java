@@ -23,7 +23,7 @@ public class FileTreeImpl implements FileTree {
 
         String result = "";
 
-        File file = new File(String.valueOf(path));
+        File file = path.toFile();
         if (file.isFile()) {
             result = file.getName() + " " + file.length() + " bytes";
         }
